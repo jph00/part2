@@ -1,4 +1,6 @@
-import math, keras, datetime, pandas as pd, numpy as np, keras.backend as K, threading, json, re, collections, tarfile, tensorflow as tf, matplotlib.pyplot as plt, xgboost, operator, random, pickle, glob, os, bcolz, shutil, sklearn, functools, itertools
+import math, keras, datetime, pandas as pd, numpy as np, keras.backend as K, threading, json, re, collections
+import tarfile, tensorflow as tf, matplotlib.pyplot as plt, xgboost, operator, random, pickle, glob, os, bcolz
+import shutil, sklearn, functools, itertools, scipy
 from PIL import Image
 from concurrent.futures import ProcessPoolExecutor, as_completed, ThreadPoolExecutor
 import matplotlib.patheffects as PathEffects

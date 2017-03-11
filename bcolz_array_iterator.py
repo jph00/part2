@@ -53,7 +53,9 @@ class BcolzArrayIterator(object):
         self.shuffle = shuffle
         self.seed = seed
 
+
     def reset(self): self.batch_index = 0
+
 
     def next(self):
         with self.lock:
@@ -83,14 +85,15 @@ class BcolzArrayIterator(object):
                     self.batch_index = 0
                     break
 
-        batch_x = np.concatenate(batches_x)
-        if self.y is None: return batch_x
+            batch_x = np.concatenate(batches_x)
+            if self.y is None: return batch_x
 
-        batch_y = np.concatenate(batches_y)
-        if self.w is None: return batch_x, batch_y
+            batch_y = np.concatenate(batches_y)
+            if self.w is None: return batch_x, batch_y
 
-        batch_w = np.concatenate(batches_w)
-        return batch_x, batch_y, batch_w
+            batch_w = np.concatenate(batches_w)
+            return batch_x, batch_y, batch_w
+
 
     def __iter__(self): return self
 
