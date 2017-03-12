@@ -63,8 +63,8 @@ class BcolzArrayIterator(object):
             if self.batch_index == 0:
                 if self.seed is not None:
                     np.random.seed(self.seed + self.total_batches_seen)
-                self.index_array = (np.random.permutation(self.X.nchunks + 1) if self.shuffle
-                    else np.arange(self.X.nchunks + 1))
+                index_length = (self.X.nchunks + 1) if self.X.leftover_elements > 0 else self.X.nchunks
+                self.index_array = (np.random.permutation(index_length) if self.shuffle else np.arange(index_length))
 
             #batches_x = np.zeros((self.batch_size,)+self.X.shape[1:])
             batches_x, batches_y, batches_w = [],[],[]
