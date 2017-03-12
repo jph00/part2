@@ -29,6 +29,7 @@ class BcolzArrayIterator(object):
         >>> C = np.concatenate(C_list)
         >>> np.allclose(sorted(A.flatten()), sorted(C.flatten()))
         True
+        >>> c.purge()
     """
 
     def __init__(self, X, y=None, w=None, batch_size=32, shuffle=False, seed=None):
