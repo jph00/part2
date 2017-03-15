@@ -38,6 +38,7 @@ def load(fname): return pickle.load(open(fname, 'rb'))
 
 
 def limit_mem():
+    K.get_session().close()
     cfg = K.tf.ConfigProto()
     cfg.gpu_options.allow_growth = True
     K.set_session(K.tf.Session(config=cfg))
