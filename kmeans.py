@@ -12,6 +12,11 @@ def plot_data(centroids, data, n_samples):
         plt.plot(centroid[0], centroid[1], markersize=5, marker="x", color='m', mew=2)
 
         
+def all_distances(a, b):
+    diff = tf.squared_difference(tf.expand_dims(a, 0), tf.expand_dims(b,1))
+    return tf.reduce_sum(diff, axis=2)
+        
+        
 class Kmeans(object):
 
     def __init__(self, data, n_clusters):
@@ -42,8 +47,7 @@ class Kmeans(object):
         r = tf.expand_dims(self.v_data[tf.squeeze(r_index)], dim=1)
         initial_centroids = []
         for i in range(k):
-            diff = tf.squared_difference(tf.expand_dims(self.v_data, 0), tf.expand_dims(r,1))
-            dist = tf.reduce_sum(diff, axis=2)
+            dist = all_distances(self.v_data, r)
             farthest_index = tf.argmax(tf.reduce_min(dist, axis=0), 0)
             farthest_point = self.v_data[tf.to_int32(farthest_index)]
             initial_centroids.append(farthest_point)
@@ -57,10 +61,11 @@ class Kmeans(object):
         return tf.gather(self.v_data, centroid_indices)
 
     def assign_to_nearest(self, centroids):
-        dim_dists = tf.squared_difference(tf.expand_dims(self.v_data, 0), tf.expand_dims(centroids, 1))
-        return tf.argmin(tf.reduce_sum(dim_dists , 2), 0)
+        return tf.argmin(all_distances(self.v_data, centroids), 0)
 
     def update_centroids(self, nearest_indices):
         partitions = tf.dynamic_partition(self.v_data, tf.to_int32(nearest_indices), self.n_clusters)
         return tf.concat([tf.expand_dims(tf.reduce_mean(partition, 0), 0)
                                       for partition in partitions], 0)
+   
+        

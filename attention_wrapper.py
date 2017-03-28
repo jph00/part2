@@ -9,6 +9,7 @@ class Attention(Layer):
         self.supports_masking = True
         self.fn_rnn = fn_rnn
         self.nlayers = nlayers
+        self.input_spec = [InputSpec(ndim=3), InputSpec(ndim=3)]
         super(Attention, self).__init__(**kwargs)
 
 
@@ -21,11 +22,10 @@ class Attention(Layer):
 
 
     def build(self, input_shape):
-        enc_shape, dec_shape = input_shape
-        assert len(enc_shape) >= 3
+        self.enc_shape, self.dec_shape = input_shape
+        assert len(self.enc_shape) >= 3
         self.layers = [self.fn_rnn() for i in range(self.nlayers)]
-        self.input_spec = [InputSpec(shape=s) for s in input_shape]
-        nb_samples, nb_time, nb_dims = dec_shape
+        nb_samples, nb_time, nb_dims = self.dec_shape
         l0 = self.layers[0]
 
         out_shape = self.get_output_shape_for(input_shape)
@@ -34,7 +34,7 @@ class Attention(Layer):
 
         init = l0.init
         out_dim = l0.output_dim
-        self.W1 = self.w((enc_shape[-1], nb_dims), init, '{}_W1')
+        self.W1 = self.w((self.enc_shape[-1], nb_dims), init, '{}_W1')
         self.W2 = self.w((out_dim, nb_dims), init, '{}_W2')
         self.b2 = self.w((nb_dims,), zero, '{}_b2')
         self.V =  self.w((nb_dims,), init, '{}_V')
@@ -79,8 +79,6 @@ class Attention(Layer):
 
 
     def call(self, x, mask=None):
-        enc_shape = self.input_spec[0].shape
-        dec_shape = self.input_spec[1].shape
         l0 = self.layers[0]
         enc_output, dec_input = x
 
@@ -92,7 +90,7 @@ class Attention(Layer):
 
         last_output, outputs, states = K.rnn(self.step, preprocessed_input,
              initial_states, go_backwards=l0.go_backwards, mask=mask[1],
-             constants=constants, unroll=l0.unroll, input_length=dec_shape[1])
+             constants=constants, unroll=l0.unroll, input_length=self.dec_shape[1])
         if l0.stateful:
             self.updates = []
             for i in range(len(states)):
