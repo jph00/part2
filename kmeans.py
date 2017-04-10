@@ -7,7 +7,7 @@ def plot_data(centroids, data, n_samples):
     colour = plt.cm.rainbow(np.linspace(0,1,len(centroids)))
     for i, centroid in enumerate(centroids):
         samples = data[i*n_samples:(i+1)*n_samples]
-        plt.scatter(samples[:,0], samples[:,1], c=colour[i])
+        plt.scatter(samples[:,0], samples[:,1], c=colour[i], s=1)
         plt.plot(centroid[0], centroid[1], markersize=10, marker="x", color='k', mew=5)
         plt.plot(centroid[0], centroid[1], markersize=5, marker="x", color='m', mew=2)
 

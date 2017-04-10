@@ -29,7 +29,6 @@ class BcolzArrayIterator(object):
         >>> C = np.concatenate(C_list)
         >>> np.allclose(sorted(A.flatten()), sorted(C.flatten()))
         True
-        >>> c.purge()
     """
 
     def __init__(self, X, y=None, w=None, batch_size=32, shuffle=False, seed=None):
@@ -53,21 +52,20 @@ class BcolzArrayIterator(object):
         self.lock = threading.Lock()
         self.shuffle = shuffle
         self.seed = seed
-        self.loop()
 
 
     def reset(self): self.batch_index = 0
 
-    def loop(self):
-        self.batch_index = 0
-        if self.seed is not None:
-            np.random.seed(self.seed + self.total_batches_seen)
-        index_length = (self.X.nchunks + 1) if self.X.leftover_elements > 0 else self.X.nchunks
-        self.index_array = (np.random.permutation(index_length) if self.shuffle else np.arange(index_length))
-
 
     def next(self):
         with self.lock:
+            if self.batch_index == 0:
+                if self.seed is not None:
+                    np.random.seed(self.seed + self.total_batches_seen)
+                self.index_array = (np.random.permutation(self.X.nchunks + 1) if self.shuffle
+                    else np.arange(self.X.nchunks + 1))
+
+            #batches_x = np.zeros((self.batch_size,)+self.X.shape[1:])
             batches_x, batches_y, batches_w = [],[],[]
             for i in range(self.chunks_per_batch):
                 current_index = self.index_array[self.batch_index]
@@ -84,7 +82,7 @@ class BcolzArrayIterator(object):
                 if not self.y is None: batches_y.append(self.y[idx: idx + current_batch_size])
                 if not self.w is None: batches_w.append(self.w[idx: idx + current_batch_size])
                 if self.batch_index >= len(self.index_array):
-                    self.loop()
+                    self.batch_index = 0
                     break
 
             batch_x = np.concatenate(batches_x)

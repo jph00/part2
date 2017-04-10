@@ -6,6 +6,7 @@ from concurrent.futures import ProcessPoolExecutor, as_completed, ThreadPoolExec
 import matplotlib.patheffects as PathEffects
 from sklearn.preprocessing import LabelEncoder, StandardScaler
 from sklearn.neighbors import NearestNeighbors, LSHForest
+import IPython
 from IPython.display import display, Audio
 from numpy.random import normal
 from gensim.models import word2vec
@@ -15,7 +16,7 @@ from functools import reduce
 from itertools import chain
 
 from tensorflow.python.framework import ops
-from tensorflow.contrib import rnn, legacy_seq2seq as seq2seq
+#from tensorflow.contrib import rnn, legacy_seq2seq as seq2seq
 
 from keras_tqdm import TQDMNotebookCallback
 from keras import initializations
