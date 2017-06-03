@@ -11,7 +11,7 @@ class BcolzArrayIterator(object):
         :Example:
         X = bcolz.open('file_path/feature_file.bc', mode='r')
         y = bcolz.open('file_path/label_file.bc', mode='r')
-        trn_batches = BcolzArrayIterator([X], y, batch_size=64, shuffle=True)
+        trn_batches = BcolzArrayIterator(X, y, batch_size=64, shuffle=True)
         model.fit_generator(generator=trn_batches, samples_per_epoch=trn_batches.N, nb_epoch=1)
         :param X_ftrs: Array of input features
         :param y: (optional) Input labels
@@ -24,14 +24,19 @@ class BcolzArrayIterator(object):
         >>> c = bcolz.carray(A, rootdir='test.bc', mode='w', expectedlen=A.shape[0], chunklen=16)
         >>> c.flush()
         >>> Bc = bcolz.open('test.bc')
-        >>> bc_it = BcolzArrayIterator([Bc], shuffle=True)
-        >>> C_list = [next(bc_it)[0] for i in range(11)]
+        >>> bc_it = BcolzArrayIterator(Bc, shuffle=True)
+        >>> C_list = [next(bc_it) for i in range(11)]
         >>> C = np.concatenate(C_list)
         >>> np.allclose(sorted(A.flatten()), sorted(C.flatten()))
         True
     """
 
     def __init__(self, X_ftrs, y=None, w=None, batch_size=32, shuffle=False, seed=None):
+        if isinstance(X_ftrs, bcolz.carray):
+            self.onefeature = True
+            X_ftrs = [X_ftrs]
+        else:
+            self.onefeature = False
         for X in X_ftrs:
             if X is None or len(X) != len(X_ftrs[0]):
                 raise ValueError('X (features) should have the same length')
@@ -93,6 +98,8 @@ class BcolzArrayIterator(object):
                     break
 
             batches_x = [np.concatenate(b) for b in batches_x]
+            if self.onefeature:
+                batches_x = batches_x[0]
             if self.y is None: return batches_x
 
             batch_y = np.concatenate(batches_y)
