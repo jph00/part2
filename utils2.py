@@ -11,7 +11,7 @@ from IPython.display import display, Audio
 from numpy.random import normal
 from gensim.models import word2vec
 from keras.preprocessing.text import Tokenizer
-from nltk.tokenize import ToktokTokenizer, StanfordTokenizer
+from nltk.tokenize import ToktokTokenizer
 from functools import reduce
 from itertools import chain
 
@@ -19,7 +19,6 @@ from tensorflow.python.framework import ops
 #from tensorflow.contrib import rnn, legacy_seq2seq as seq2seq
 
 from keras_tqdm import TQDMNotebookCallback
-from keras import initializations
 from keras.applications.resnet50 import ResNet50, decode_predictions, conv_block, identity_block
 from keras.applications.vgg16 import VGG16
 from keras.preprocessing import image
